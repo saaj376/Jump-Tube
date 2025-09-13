@@ -1,73 +1,119 @@
-# Welcome to your Lovable project
+# JumpTube - AI-Powered YouTube Search Engine
 
-## Project info
+A modern, beautiful frontend for searching YouTube videos with AI-powered timestamped results and intelligent summaries.
 
-**URL**: https://lovable.dev/projects/145d049e-b32f-4c42-b64e-1dc8607cd941
+## ✨ Features
 
-## How can I edit this code?
+- **🔍 Smart Search**: Search across millions of YouTube videos
+- **⏰ Timestamp Search**: Find specific moments within videos using AI
+- **📝 AI Summaries**: Get intelligent video summaries powered by Gemini AI
+- **🎨 Beautiful UI**: Modern dark theme with smooth animations
+- **📱 Responsive**: Works perfectly on desktop and mobile
 
-There are several ways of editing your application.
+## 🚀 Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/145d049e-b32f-4c42-b64e-1dc8607cd941) and start prompting.
+Make sure you have the backend running first. The backend should be available at `http://localhost:8000`.
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend Setup
 
-**Use your preferred IDE**
+```bash
+# Install dependencies
+npm install
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The frontend will be available at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend Setup
 
-**Use GitHub Codespaces**
+The frontend expects the following API endpoints to be available:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `GET /api/search` - Search YouTube videos
+- `POST /api/search-timestamps` - Search within video timestamps
+- `POST /api/summarize` - Generate AI video summaries
+- `GET /health` - Health check
 
-## What technologies are used for this project?
+Make sure your FastAPI backend is running with these endpoints.
 
-This project is built with:
+## 🎯 API Configuration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Update the `API_BASE` constant in `src/pages/Index.tsx` if your backend is running on a different URL:
 
-## How can I deploy this project?
+```typescript
+const API_BASE = "http://localhost:8000"; // Change this to match your backend
+```
 
-Simply open [Lovable](https://lovable.dev/projects/145d049e-b32f-4c42-b64e-1dc8607cd941) and click on Share -> Publish.
+## 🛠 Built With
 
-## Can I connect a custom domain to my Lovable project?
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Vite** - Build tool
+- **Shadcn/ui** - UI components
+- **Lucide React** - Icons
+- **React Router** - Navigation
 
-Yes, you can!
+## 🎨 Design System
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The app uses a custom design system with:
+- **Dark theme** with electric blue/purple gradients
+- **Glassmorphism** effects
+- **Smooth animations** and transitions
+- **Responsive design** for all screen sizes
+- **Accessibility** features built-in
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📱 Screenshots
+
+### Hero Section
+- Clean search interface with gradient backgrounds
+- AI-powered search suggestions
+- Beautiful loading states
+
+### Search Results
+- Card-based video layout
+- Thumbnail previews
+- Action buttons for each video
+
+### Timestamp Search
+- Modal interface for searching within videos
+- Highlighted timestamp results
+- Direct links to video moments
+
+### AI Summaries
+- Clean summary presentation
+- Powered by Gemini AI
+- Easy to read format
+
+## 🔧 Customization
+
+### Changing Colors
+Update the color palette in `src/index.css`:
+
+```css
+:root {
+  --primary: 225 80% 60%;        /* Electric blue */
+  --primary-glow: 225 100% 70%;  /* Brighter blue */
+  --secondary: 260 60% 18%;      /* Purple accent */
+}
+```
+
+### Adding New Features
+1. Create components in `src/components/`
+2. Add new pages to `src/pages/`
+3. Update routing in `src/App.tsx`
+
+## 📄 License
+
+This project is part of the JumpTube YouTube search engine system.
+
+## 🤝 Contributing
+
+Feel free to submit issues and enhancement requests!
+
+---
+
+**Note**: Make sure the backend is running before starting the frontend. The app will show connection errors if the API is not available.

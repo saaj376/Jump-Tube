@@ -2,95 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* JumpTube Design System - Dark AI-Powered Interface */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core background system */
+    --background: 222 20% 4%;
+    --foreground: 210 20% 95%;
+    
+    /* Card system with subtle transparency */
+    --card: 225 15% 8%;
+    --card-foreground: 210 20% 92%;
+    
+    /* Interactive surfaces */
+    --popover: 225 15% 6%;
+    --popover-foreground: 210 20% 95%;
+    
+    /* Primary electric blue gradient system */
+    --primary: 225 80% 60%;
+    --primary-foreground: 210 20% 98%;
+    --primary-glow: 225 100% 70%;
+    
+    /* Secondary purple accent */
+    --secondary: 260 60% 18%;
+    --secondary-foreground: 210 20% 95%;
+    
+    /* Muted surfaces */
+    --muted: 225 15% 12%;
+    --muted-foreground: 215 15% 65%;
+    
+    /* Accent electric system */
+    --accent: 225 80% 60%;
+    --accent-foreground: 210 20% 98%;
+    
+    /* Status colors */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 20% 98%;
+    --success: 142 70% 45%;
+    --warning: 45 90% 55%;
+    
+    /* Interactive elements */
+    --border: 225 15% 15%;
+    --input: 225 15% 12%;
+    --ring: 225 80% 60%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --radius: 12px;
+    
+    /* Beautiful gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(225 80% 60%), hsl(225 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(260 60% 18%), hsl(225 80% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(222 20% 4%) 0%, hsl(225 15% 8%) 50%, hsl(222 20% 4%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(225 15% 8%), hsl(225 15% 6%));
+    
+    /* Glowing shadows */
+    --shadow-glow: 0 0 40px hsl(225 80% 60% / 0.3);
+    --shadow-card: 0 8px 32px hsl(225 15% 2% / 0.4);
+    --shadow-button: 0 4px 16px hsl(225 80% 60% / 0.2);
+    
+    /* Smooth animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -101,5 +72,85 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background: var(--gradient-hero);
+    min-height: 100vh;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/20;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/40 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/60;
+  }
+}
+
+@layer components {
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .glow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-primary-glow to-accent bg-clip-text text-transparent;
+  }
+  
+  /* Backdrop blur effects */
+  .backdrop-glass {
+    @apply backdrop-blur-xl bg-card/80 border border-border/50;
+  }
+  
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+  
+  /* Loading shimmer */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+  
+  .shimmer::before {
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-primary/10 to-transparent;
+    content: '';
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  /* Pulse animation */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes pulse-glow {
+    from {
+      box-shadow: 0 0 20px hsl(225 80% 60% / 0.2);
+    }
+    to {
+      box-shadow: 0 0 40px hsl(225 80% 60% / 0.4);
+    }
   }
 }
