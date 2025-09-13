@@ -24,5 +24,9 @@ So I've created a data preprocessing pipeline which uses ffmpeg to stream the au
 - open another window in the terminal from the Jump-Tube folder and type npm run dev
 - click on the link given in the terminal and you're all set.
 
+## Future Enhancements
+- To make this project production level ready, we could implement redis and celery for asynchronous task handling and faster cache results.
+- Can be bundled into a chrome extension so that everyone can use
+
 ## Demo Video
 [Watch the demo](https://youtu.be/WVD4m2CSuus)
