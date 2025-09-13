@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { SearchBar } from "@/components/SearchBar";
-import { VideoCard } from "@/components/VideoCard";
+import { VideoPlayer } from "@/components/VideoPlayer";
+import { VideoSidebar } from "@/components/VideoSidebar";
+import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button"; 
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,58 +18,28 @@ import {
   Sparkles,
   Loader2,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Menu,
+  X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface VideoInfo {
-  video_id: string;
-  title: string;
-  description: string;
-  url: string;
-}
-
-interface SearchResponse {
-  query: string;
-  results: VideoInfo[];
-  total_results: number;
-}
-
-interface TimestampMatch {
-  time: string;
-  seconds: string;
-  text: string;
-  url: string;
-}
-
-interface TimestampSearchResponse {
-  video_url: string;
-  prompt: string;
-  matches: TimestampMatch[];
-}
-
-interface SummarizeResponse {
-  video_url: string;
-  summary: string;
-}
-
-const API_BASE = "http://localhost:8000"; // Update this to match your FastAPI server
+import { apiService, VideoInfo, SearchResponse, TimestampMatch, TimestampSearchResponse, SummarizeResponse } from "@/lib/api";
 
 const Index = () => {
   const [searchResults, setSearchResults] = useState<VideoInfo[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentQuery, setCurrentQuery] = useState("");
   
+  // Video player state
+  const [selectedVideo, setSelectedVideo] = useState<VideoInfo | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isHomePage, setIsHomePage] = useState(true);
+  
   // Timestamp search state
-  const [timestampSearchOpen, setTimestampSearchOpen] = useState(false);
-  const [selectedVideoUrl, setSelectedVideoUrl] = useState("");
-  const [timestampQuery, setTimestampQuery] = useState("");
   const [timestampResults, setTimestampResults] = useState<TimestampMatch[]>([]);
   const [isTimestampSearching, setIsTimestampSearching] = useState(false);
   
   // Summarize state
-  const [summaryOpen, setSummaryOpen] = useState(false);
-  const [summaryVideoUrl, setSummaryVideoUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
   
@@ -76,14 +48,13 @@ const Index = () => {
   const handleSearch = async (query: string) => {
     setIsSearching(true);
     setCurrentQuery(query);
+    setSelectedVideo(null); // Clear selected video on new search
+    setTimestampResults([]);
+    setSummary("");
+    setIsHomePage(false); // Move to video player view
     
     try {
-      const response = await fetch(`${API_BASE}/api/search?query=${encodeURIComponent(query)}&maxresults=12`);
-      if (!response.ok) {
-        throw new Error('Search failed');
-      }
-      
-      const data: SearchResponse = await response.json();
+      const data = await apiService.searchVideos(query, 12);
       setSearchResults(data.results);
       
       toast({
@@ -102,36 +73,28 @@ const Index = () => {
     }
   };
 
-  const handleTimestampSearch = (videoUrl: string) => {
-    setSelectedVideoUrl(videoUrl);
-    setTimestampSearchOpen(true);
+  const handleGoHome = () => {
+    setIsHomePage(true);
+    setSearchResults([]);
+    setSelectedVideo(null);
+    setCurrentQuery("");
     setTimestampResults([]);
-    setTimestampQuery("");
+    setSummary("");
   };
 
-  const performTimestampSearch = async () => {
-    if (!timestampQuery.trim()) return;
+  const handleVideoSelect = (video: VideoInfo) => {
+    setSelectedVideo(video);
+    setTimestampResults([]);
+    setSummary("");
+  };
+
+  const handleTimestampSearch = async (query: string) => {
+    if (!selectedVideo || !query.trim()) return;
     
     setIsTimestampSearching(true);
     
     try {
-      const response = await fetch(`${API_BASE}/api/search-timestamps`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          video_url: selectedVideoUrl,
-          prompt: timestampQuery,
-          top_k: 5
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Timestamp search failed');
-      }
-      
-      const data: TimestampSearchResponse = await response.json();
+      const data = await apiService.searchTimestamps(selectedVideo.url, query, 5);
       setTimestampResults(data.matches);
       
       toast({
@@ -150,31 +113,13 @@ const Index = () => {
     }
   };
 
-  const handleSummarize = (videoUrl: string) => {
-    setSummaryVideoUrl(videoUrl);
-    setSummaryOpen(true);
-    setSummary("");
-  };
-
-  const performSummarize = async () => {
+  const handleSummarize = async () => {
+    if (!selectedVideo) return;
+    
     setIsSummarizing(true);
     
     try {
-      const response = await fetch(`${API_BASE}/api/summarize`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          video_url: summaryVideoUrl
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Summarization failed');
-      }
-      
-      const data: SummarizeResponse = await response.json();
+      const data = await apiService.summarizeVideo(selectedVideo.url);
       setSummary(data.summary);
       
       toast({
@@ -195,243 +140,144 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 px-4">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        
-        <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="p-3 bg-gradient-primary rounded-2xl glow-primary">
-              <Youtube className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-6xl font-bold gradient-text">
-              JumpTube
-            </h1>
-          </div>
-          
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            AI-powered YouTube search engine with <span className="text-primary font-semibold">timestamped results</span> and <span className="text-primary font-semibold">intelligent summaries</span>
-          </p>
-          
-          <SearchBar 
-            onSearch={handleSearch} 
-            isLoading={isSearching}
-            className="max-w-3xl mx-auto"
-            placeholder="Search for any topic across YouTube..."
-          />
-          
-          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Search className="h-4 w-4 text-primary" />
-              Video Search
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" />
-              Timestamp Search
-            </div>
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" />
-              AI Summaries
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Search Results */}
-      {(searchResults.length > 0 || isSearching) && (
-        <section className="py-12 px-4">
-          <div className="container mx-auto max-w-7xl">
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-2xl font-bold">
-                {isSearching ? "Searching..." : `Results for "${currentQuery}"`}
-              </h2>
-              {!isSearching && (
-                <Badge variant="secondary" className="px-3 py-1">
-                  {searchResults.length} videos
-                </Badge>
-              )}
-            </div>
-            
-            {isSearching ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <Card key={i} className="backdrop-glass shimmer h-80" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {searchResults.map((video) => (
-                  <VideoCard 
-                    key={video.video_id} 
-                    video={video}
-                    onTimestampSearch={handleTimestampSearch}
-                    onSummarize={handleSummarize}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* Timestamp Search Modal */}
-      {timestampSearchOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="backdrop-glass max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6 space-y-6">
+      {isHomePage ? (
+        // Home Page with Centered Search
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b">
+            <div className="container mx-auto px-4 py-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Search Within Video
-                </h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setTimestampSearchOpen(false)}
-                >
-                  ✕
-                </Button>
+                <Logo variant="text" size="md" />
               </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Video URL</label>
-                  <Input 
-                    value={selectedVideoUrl} 
-                    readOnly 
-                    className="backdrop-glass" 
+            </div>
+          </header>
+
+          {/* Hero Section */}
+          <section className="flex-1 flex items-center justify-center px-4 py-20">
+            <div className="container mx-auto max-w-4xl text-center">
+              <div className="space-y-12">
+                {/* Main Title */}
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center gap-6 mb-8">
+                    <Logo variant="icon" size="xl" className="mr-2" />
+                    <h1 className="text-7xl font-bold gradient-text">
+                      JumpTube
+                    </h1>
+                  </div>
+                  
+                  <p className="text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                    AI-powered YouTube search engine with <span className="text-primary font-semibold">timestamped results</span> and <span className="text-primary font-semibold">intelligent summaries</span>
+                  </p>
+                </div>
+
+                {/* Centered Search Bar */}
+                <div className="max-w-4xl mx-auto">
+                  <SearchBar 
+                    onSearch={handleSearch} 
+                    isLoading={isSearching}
+                    className="w-full text-lg py-4 px-6"
+                    placeholder="Search for any topic across YouTube..."
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium mb-2">What are you looking for?</label>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="e.g., 'machine learning', 'how to setup'..."
-                      value={timestampQuery}
-                      onChange={(e) => setTimestampQuery(e.target.value)}
-                      className="backdrop-glass"
-                      onKeyDown={(e) => e.key === 'Enter' && performTimestampSearch()}
-                    />
-                    <Button 
-                      variant="electric" 
-                      onClick={performTimestampSearch}
-                      disabled={isTimestampSearching || !timestampQuery.trim()}
-                    >
-                      {isTimestampSearching ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Search className="h-4 w-4" />
-                      )}
-                    </Button>
+                {/* Feature Icons */}
+                <div className="flex items-center justify-center gap-8 text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Search className="h-5 w-5 text-primary" />
+                    <span className="text-lg">Video Search</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <span className="text-lg">Timestamp Search</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span className="text-lg">AI Summaries</span>
                   </div>
                 </div>
               </div>
-
-              {timestampResults.length > 0 && (
-                <div className="space-y-4">
-                  <h4 className="font-semibold">Found Timestamps:</h4>
-                  <div className="space-y-3">
-                    {timestampResults.map((match, index) => (
-                      <Card key={index} className="p-4 backdrop-glass border-border/50">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="outline" className="text-primary">
-                                {match.time}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {match.seconds}s
-                              </span>
-                            </div>
-                            <p className="text-sm">{match.text}</p>
-                          </div>
-                          <Button
-                            variant="outline-glow"
-                            size="sm"
-                            onClick={() => window.open(match.url, '_blank')}
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Jump
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          </Card>
+          </section>
         </div>
-      )}
-
-      {/* Summary Modal */}
-      {summaryOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="backdrop-glass max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6 space-y-6">
+      ) : (
+        // Video Player View
+        <div className="min-h-screen flex flex-col">
+          {/* Header with Go Back Button */}
+          <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b">
+            <div className="container mx-auto px-4 py-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  AI Video Summary
-                </h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setSummaryOpen(false)}
-                >
-                  ✕
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Video URL</label>
-                  <Input 
-                    value={summaryVideoUrl} 
-                    readOnly 
-                    className="backdrop-glass" 
-                  />
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleGoHome}
+                    className="flex items-center gap-2 hover:bg-primary/10"
+                  >
+                    <ArrowRight className="h-4 w-4 rotate-180" />
+                    Back to Home
+                  </Button>
+                  <Logo variant="text" size="md" />
                 </div>
                 
-                <Button 
-                  variant="hero" 
-                  onClick={performSummarize}
-                  disabled={isSummarizing}
-                  className="w-full"
-                >
-                  {isSummarizing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Generating Summary...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="h-4 w-4" />
-                      Generate AI Summary
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {summary && (
-                <div className="space-y-4">
-                  <Separator />
-                  <div>
-                    <h4 className="font-semibold mb-3 flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-primary" />
-                      Summary
-                    </h4>
-                    <Card className="p-4 backdrop-glass border-border/50">
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                        {summary}
-                      </p>
-                    </Card>
-                  </div>
+                <div className="flex items-center gap-4">
+                  <SearchBar 
+                    onSearch={handleSearch} 
+                    isLoading={isSearching}
+                    className="max-w-md"
+                    placeholder="Search YouTube videos..."
+                  />
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="lg:hidden"
+                  >
+                    {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+                  </Button>
                 </div>
-              )}
+              </div>
             </div>
-          </Card>
+          </header>
+
+          {/* Main Content */}
+          <div className="flex h-[calc(100vh-80px)]">
+            {/* Video Player Section */}
+            <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:mr-80' : ''}`}>
+              <div className="h-full p-6">
+                <VideoPlayer
+                  video={selectedVideo}
+                  timestampResults={timestampResults}
+                  isTimestampSearching={isTimestampSearching}
+                  onTimestampSearch={handleTimestampSearch}
+                  onSummarize={handleSummarize}
+                  isSummarizing={isSummarizing}
+                  summary={summary}
+                />
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className={`fixed lg:relative top-20 lg:top-0 right-0 h-[calc(100vh-80px)] lg:h-full w-80 bg-background/95 backdrop-blur-md border-l transition-transform duration-300 z-30 ${
+              sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+            }`}>
+              <VideoSidebar
+                searchResults={searchResults}
+                isSearching={isSearching}
+                currentQuery={currentQuery}
+                onVideoSelect={handleVideoSelect}
+                selectedVideo={selectedVideo}
+              />
+            </div>
+          </div>
+
+          {/* Mobile Sidebar Overlay */}
+          {sidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
         </div>
       )}
     </div>

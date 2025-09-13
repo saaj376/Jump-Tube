@@ -2,28 +2,25 @@ import { useState } from "react";
 import { Play, Clock, Search as SearchIcon, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-interface VideoInfo {
-  video_id: string;
-  title: string;
-  description: string;
-  url: string;
-}
+import { VideoInfo } from "@/lib/api";
 
 interface VideoCardProps {
   video: VideoInfo;
   onTimestampSearch?: (videoUrl: string) => void;
   onSummarize?: (videoUrl: string) => void;
+  isSelected?: boolean;
 }
 
-export function VideoCard({ video, onTimestampSearch, onSummarize }: VideoCardProps) {
+export function VideoCard({ video, onTimestampSearch, onSummarize, isSelected = false }: VideoCardProps) {
   const [imageError, setImageError] = useState(false);
   
   const thumbnailUrl = `https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`;
   const fallbackThumbnail = `https://img.youtube.com/vi/${video.video_id}/hqdefault.jpg`;
 
   return (
-    <Card className="group backdrop-glass hover:glow-card transition-smooth hover:scale-[1.02] border-border/50">
+    <Card className={`group backdrop-glass hover:glow-card transition-smooth hover:scale-[1.02] border-border/50 ${
+      isSelected ? 'ring-2 ring-primary bg-primary/5' : ''
+    }`}>
       <div className="relative overflow-hidden rounded-t-lg">
         <img
           src={imageError ? fallbackThumbnail : thumbnailUrl}
