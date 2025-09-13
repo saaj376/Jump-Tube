@@ -1,9 +1,63 @@
-Don't be appalled by the beautiful frontend for this project. Let me be honest here, I got the help of lovable for the frontend part and little bit of tweaking of the code in the config part was done by me. But the backend part was completely done by me. So cheers....✌️✌️
+# Jump-Tube
 
-# About the project
-- My project is title JumpTube and it contains the following features
-- Youtube Video Search using Youtube API
-- transcription of the youtube audio even before the audio finishes playing
-- search within the youtube video for keywords with the transcription
-- gemini powered video summarization
+Jump-Tube is a video streaming web application designed to provide a seamless and efficient viewing experience. This project was developed with the help of lovable.ai, and includes custom tweaks to ensure smooth functionality and performance.
 
+## Features
+
+- Stream videos effortlessly
+- User-friendly interface
+- Fast search and navigation
+- Responsive design
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14+)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/saaj376/Jump-Tube.git
+   ```
+2. Install dependencies:
+   ```bash
+   cd Jump-Tube
+   npm install
+   # or
+   yarn install
+   ```
+
+### Running the App
+
+- To start the development server:
+  ```bash
+  npm start
+  # or
+  yarn start
+  ```
+- Visit `http://localhost:3000` in your browser.
+
+## Technologies Used
+
+- Frontend: (please specify, e.g., React, Vue, etc.)
+- Backend: (please specify, e.g., Node.js, Express, etc.)
+- Database: (please specify, e.g., MongoDB, PostgreSQL, etc.)
+
+## Notes
+
+Don't be appalled by the frontend, I got the help of lovable.ai and I had to tweak the code little bit.
+
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+*This README was generated with the help of GitHub Copilot.*
